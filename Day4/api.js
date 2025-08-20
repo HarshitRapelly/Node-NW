@@ -9,10 +9,12 @@ dotenv.config();
 const {PORT, DB_PASSWORD, DB_USER} = process.env;
 
 const app = express();
-const UserModel = require("./UserModel");
-const ProductModel = require("./ProductModel")
+const UserRouter = require("./router/UserRouter");
+const ProductRouter = require("./router/ProductRouter");
 
-const {getAllFactory,createFactory,getByIdFactory,deleteByIdFactory} = require("./utility/crudFactory");
+
+
+
 
 
 
@@ -23,29 +25,6 @@ mongoose.connect(dbURL).then(function(connection){
     console.log("Connection Success");
 }).catch(err=>console.log(err));
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const port = process.env.PORT || 3000;
-
-// read the JSON file where we have our details of users
-// const strContent = fs.readFileSync("./dev-data.json", "utf-8");
-// const userDataStore = JSON.parse(strContent);
 
 // Middleware to parse JSON
 app.use(express.json()); // to get data from user, is example for userDefinedMiddleware
@@ -63,11 +42,10 @@ function findUserById(id) {
 }
 
 
-// Handler Functions for Users
-const createUserHandler = createFactory(UserModel);
-const getUserById = getByIdFactory(UserModel);
-const getAllUsers = getAllFactory(UserModel)
-const deleteUserById = deleteByIdFactory(UserModel);
+
+app.use("/api/user",UserRouter);
+app.use("/api/product",ProductRouter);
+
 const checkInput = function(req, res, next){
     if (req.method === "POST") {
         const userDetails = req.body;
@@ -81,40 +59,32 @@ const checkInput = function(req, res, next){
     next();
 }
 
+// Handler Functions for Users
+// const createUserHandler = createFactory(UserModel);
+// const getUserById = getByIdFactory(UserModel);
+// const getAllUsers = getAllFactory(UserModel)
+// const deleteUserById = deleteByIdFactory(UserModel);
+
+
 // Products
-const createProductHandler = createFactory(ProductModel);
-const getAllProductHandler = getAllFactory(ProductModel);
-const getProductById = getByIdFactory(ProductModel);
-const deleteProductById = deleteByIdFactory(ProductModel);
-
-
-
-
-
+// const createProductHandler = createFactory(ProductModel);
+// const getAllProductHandler = getAllFactory(ProductModel);
+// const getProductById = getByIdFactory(ProductModel);
+// const deleteProductById = deleteByIdFactory(ProductModel);
 
 // users API'S
 //routes
-app.get("/api/user", getAllUsers);
-//we are chaining the controller functions
-app.post("/api/user",checkInput, createUserHandler);
-app.get("/api/user/:userId", getUserById);
-app.delete("/api/user/:userId",deleteUserById);
+// UserRouter.get("/", getAllUsers);
+// UserRouter.post("/",checkInput, createUserHandler);
+// UserRouter.get("/:userId", getUserById);
+// UserRouter.delete("/:userId",deleteUserById);
 
 //products API'S
-app.post("/api/product",createProductHandler);
-app.get("/api/product",getAllProductHandler);
-app.get("/api/product/:productId",getProductById);
-app.delete("/api/product/:productId",deleteProductById);
+// ProductRouter.post("/",createProductHandler);
+// ProductRouter.get("/",getAllProductHandler);
+// ProductRouter.get("/:productId",getProductById);
+// ProductRouter.delete("/:productId",deleteProductById);
 
-
-
-// closure in JS
-
-
-
-
-
-// 404 Handler
 app.use(function(req, res){
     res.status(404).json({
         status: "failure",
@@ -122,7 +92,11 @@ app.use(function(req, res){
     });
 });
 
-//app.use(checkInput);
+
+
+
+
+ 
 
 
 app.listen(PORT, () => {
@@ -130,4 +104,5 @@ app.listen(PORT, () => {
 });
 
 //At Code level -> prevent repetition -> Factory Design
-// At file level -> structure to segregate the code -> MVC (Motor view controller)
+// At file level -> structure to segregate the code -> MVC (Model view controller)
+// 
